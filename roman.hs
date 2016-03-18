@@ -7,4 +7,4 @@ f curr (last, acc) =
   (curr, if curr < last then acc - curr else acc + curr)
 
 roman :: String -> Int
-roman s = snd $ foldr (f) (0,0) $ map (c2r M.!) s
+roman s = snd $ foldr f (0,0) $ map (c2r M.!) s
