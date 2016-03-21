@@ -12,6 +12,7 @@ dispatch :: [(String, [String] -> IO ())]
 dispatch =  [ ("add", add)
             , ("view", view)
             , ("remove", remove)
+            , ("bump", bump)
             ]
 
 add :: [String] -> IO ()
@@ -32,6 +33,22 @@ remove [fileName, numberString] = do
     let number = read numberString
         todoTasks = lines contents
         newTodoItems = delete (todoTasks !! number) todoTasks
+    hPutStr tempHandle $ unlines newTodoItems
+    hClose handle
+    hClose tempHandle
+    removeFile fileName
+    renameFile tempName fileName
+
+bump :: [String] -> IO ()
+bump [fileName, numberString] = do
+    handle <- openFile fileName ReadMode
+    (tempName, tempHandle) <- openTempFile "." "temp"
+    contents <- hGetContents handle
+    let number = read numberString
+        todoTasks = lines contents
+        bumpTask = todoTasks !! number
+        removed = delete bumpTask todoTasks
+        newTodoItems = bumpTask : removed
     hPutStr tempHandle $ unlines newTodoItems
     hClose handle
     hClose tempHandle
